@@ -20,4 +20,5 @@ from cst205 import views
 urlpatterns = [
     url(r'^admin/', include(admin.site.urls)),
     url(r'^home/$', views.home, name='home'),
+    url(r'^uploadImage/$', views.uploadImage, name='uploadImage'),
 ]
