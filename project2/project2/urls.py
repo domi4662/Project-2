@@ -21,4 +21,6 @@ urlpatterns = [
     url(r'^admin/', include(admin.site.urls)),
     url(r'^home/$', views.home, name='home'),
     url(r'^uploadImage/$', views.uploadImage, name='uploadImage'),
+    url(r'^applyContour/$', views.applyContour, name='applyContour'),
+    url(r'^uploadImagePage/$', views.uploadImagePage, name='uploadImagePage'),
 ]
