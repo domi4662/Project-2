@@ -2,11 +2,10 @@
 <html lang="en">
 <head>
   <meta charset="utf-8">
-
   <!-- Always force latest IE rendering engine (even in intranet) & Chrome Frame 
        Remove this if you use the .htaccess -->
   <meta http-equiv="X-UA-Compatible" content="IE=edge,chrome=1">
-
+	<script src="https://ajax.googleapis.com/ajax/libs/jquery/1.11.3/jquery.min.js"></script>
   <title>Project 2</title>
   <meta name="description" content="">
   <meta name="author" content="Carlos Eduardo Domingues">
@@ -17,23 +16,117 @@
   <link rel="shortcut icon" href="/favicon.ico">
   <link rel="apple-touch-icon" href="/apple-touch-icon.png">
 </head>
+<script>
+			$(document).ready(function() {
+				
+				$("#contour").click(function() {
+					applyContour();
+				});
+				
+				$("#btn").click(function() {
+					var image;
+					image = take();
+					uploadImage(image);
+				});
 
+				var video = document.querySelector("#videoElement");
+
+				navigator.getUserMedia = navigator.getUserMedia || navigator.webkitGetUserMedia || navigator.mozGetUserMedia || navigator.msGetUserMedia || navigator.oGetUserMedia;
+
+				if (navigator.getUserMedia) {
+					navigator.getUserMedia({
+						video : true
+					}, handleVideo, videoError);
+				}
+
+				function handleVideo(stream) {
+					video.src = window.URL.createObjectURL(stream);
+				}
+
+				function videoError(e) {
+					// do something
+				}
+				function take() {
+					var video = document.getElementById("videoElement");
+					var canvas = document.getElementById("draw");
+					var ctx = canvas.getContext("2d");
+					ctx.drawImage(video, 0, 0, 640, 480);
+					
+					var dataURL = canvas.toDataURL("image/png");
+    			    //alert(dataURL.replace(/^data:image\/(png|jpg);base64,/, ""));
+    			    return dataURL.replace(/^data:image\/(png|jpg);base64,/, "");
+				}
+			});		
+			
+			function applyContour(){
+				alert("Hey");
+				$.ajax({
+					method : "POST",
+					url : "{% url 'applyContour' %}",
+					data : {
+						"csrfmiddlewaretoken" : "{{ csrf_token }}",
+					},
+					datatype : "json",
+					success : function(data, status, xhr) {
+						$("#imageResult").html("<img src='data:image/jpeg;base64," + data.image + "'>");
+					}
+		
+				});	
+			}
+			
+			function uploadImage(image){
+				$.ajax({
+					method : "POST",
+					url : "{% url 'uploadImage' %}",
+					data : {
+						"csrfmiddlewaretoken" : "{{ csrf_token }}",
+						"image" : image
+					},
+					datatype : "json",
+					success : function(data, status, xhr) {	
+						console.log(data);
+						$("#imageResult").html("<img src='data:image/jpeg;base64," + data.image + "'>");
+					}
+		
+				});	
+			}	
+		</script>
+		<style>
+			#container {
+				margin: 0px auto;
+				width: 500px;
+				height: 375px;
+				border: 10px #333 solid;
+			}
+			#videoElement {
+				width: 500px;
+				height: 375px;
+				background-color: #666;
+			}
+		</style>
 <body>
   <div>
     <header>
-      <h1>Home</h1>
+      <h1>MultMedia Design & Program</h1>
     </header>
-    <nav>
-      <p><a href="/">Home</a></p>
-      <p><a href="/contact">Contact</a></p>
-    </nav>
+   <div id="container">
+			<video autoplay="true" id="videoElement">
+
+			</video>
+			<input id="btn" type="button" value="Take Picture">
+			</input>
+			<canvas id="draw" width="640" height="480" style="display: none"></canvas>
+			
+			<div id="imageResult"></div>
+			<input type="button" id="contour" value="CONTOUR">
+		</div>
 
     <div>
       
     </div>
 
     <footer>
-     <p>&copy; Copyright  by Carlos Eduardo Domingues</p>
+     <p>&copy; Copyright  by Team</p>
     </footer>
   </div>
 </body>
